@@ -10,15 +10,7 @@ import swal from 'sweetalert2';
   styleUrls: ['./verify.component.css'],
 })
 export class VerifyComponent implements OnInit {
-  CityName: String;
-  PanNO: Number;
-  FullName: String;
-  EmailID: String;
-  MobileNO: Number;
-  Otp: String;
-
   title = 'personalLoan';
-
   count: number = 0;
   GetButtonCount: number = 0;
   VerifyButtonCount: number = 0;
@@ -33,7 +25,7 @@ export class VerifyComponent implements OnInit {
     this.personalLoanForm = formBuilder.group({
       otp: [[Validators.required]],
       city: ['', Validators.required],
-      pannumber: [
+      panNumber: [
         '',
         [
           Validators.required,
@@ -62,8 +54,8 @@ export class VerifyComponent implements OnInit {
   get city() {
     return this.personalLoanForm.get('city');
   }
-  get pannumber() {
-    return this.personalLoanForm.get('pannumber');
+  get panNumber() {
+    return this.personalLoanForm.get('panNumber');
   }
   get fullname() {
     return this.personalLoanForm.get('fullname');
@@ -83,7 +75,7 @@ export class VerifyComponent implements OnInit {
   getOTPfunction() {
     this.http
       .post('http://lab.thinkoverit.com/api/getOTP.php', {
-        panNumber: this.personalLoanForm.get('pannumber').value,
+        panNumber: this.personalLoanForm.get('panNumber').value,
         city: this.personalLoanForm.get('city').value,
         fullname: this.personalLoanForm.get('fullname').value,
         email: this.personalLoanForm.get('email').value,
@@ -94,9 +86,7 @@ export class VerifyComponent implements OnInit {
         swal.fire({
           icon: 'success',
           title: 'Send OTP!',
-          
         });
-
       });
     this.resendOtpButtonDisabled = true;
     this.personalLoanForm.patchValue({
@@ -105,32 +95,29 @@ export class VerifyComponent implements OnInit {
 
     const second = interval(1000);
     this.resendButtonTimeOut = second.subscribe((res) => {
-      if (res >= 180) {
+      if (res >= 3) {
         this.resendButtonTimeOut.unsubscribe();
         this.resendOtpButtonDisabled = false;
       }
     });
     this.count++;
     this.otpInputCount++;
-
     this.GetButtonCount++;
     this.VerifyButtonCount++;
   }
 
   verifyButton() {
-    this.Otp = this.personalLoanForm.get('otp').value;
-    this.FullName = this.personalLoanForm.get('fullname').value;
-
-    if (this.Otp == '') {
+    var Otp = this.personalLoanForm.get('otp').value;
+    if (Otp == '') {
       swal.fire({
         icon: 'error',
         title: 'Enter OPT',
       });
     } else {
       this.http
-        .post('http://lab.thinkoverit.com/api/getOTP.php', {
+        .post('http://lab.thinkoverit.com/api/verifyOTP.php', {
           mobile: this.personalLoanForm.get('mobile').value,
-          Otp: this.personalLoanForm.get('otp').value,
+          otp: this.personalLoanForm.get('otp').value,
         })
         .subscribe((res: any) => {
           console.warn('result', res);
