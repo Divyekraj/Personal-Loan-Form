@@ -95,7 +95,7 @@ export class VerifyComponent implements OnInit {
 
     const second = interval(1000);
     this.resendButtonTimeOut = second.subscribe((res) => {
-      if (res >= 3) {
+      if (res >= 180) {
         this.resendButtonTimeOut.unsubscribe();
         this.resendOtpButtonDisabled = false;
       }
