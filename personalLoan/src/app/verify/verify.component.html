@@ -1,4 +1,4 @@
-<div id="form" class="container">
+<div id="form">
   <h2 class="mb-0 text-center shadow-lg p-3 mb-5 rounded peronalHeading" id="">
     Personal Loan Form
   </h2>
@@ -23,7 +23,6 @@
       <span class="error" *ngIf="fullname.invalid && fullname.touched">
         <span id="vt">* Fullname is Required </span></span>
     </div>
-
     <div class="form-group">
       <label> Email <span id="vt">*</span> </label>
       <input type="email" class="form-control" formControlName="email" />
@@ -55,42 +54,36 @@
           <span id="vt">* OTP 4 Digit Number </span></span>
       </ng-template>
     </div>
+    <div class="row">
+      <div class="col-sm">
+        <div *ngIf="count == 0">
+          <button [disabled]="!personalLoanForm.valid" (click)="getOTPfunction()" type="submit" class="btn btn-primary">
+            Get OTP
+          </button>
+        </div>
+      </div>
+      <div class="col-sm">
+        <div *ngIf="count != 0">
+          <div *ngIf="count == 4; then one; else two"></div>
 
-    <div class="form-group">
-      <div class="container">
-        <div class="row">
-          <div class="col-sm">
-            <div *ngIf="VerifyButtonCount == 0">
-              <button [disabled]="!personalLoanForm.valid" (click)="getOTPfunction()" type="submit"
-                class="btn btn-primary">
-                Get OTP
-              </button>
-            </div>
-          </div>
-          <div class="col-sm">
-            <div *ngIf="GetButtonCount != 0">
-              <div *ngIf="count == 4; then one; else two"></div>
+          <ng-template #one>
+            <h6 class="text-danger">Please try again after an hour</h6>
+          </ng-template>
+          <ng-template #two>
+            <button (click)="getOTPfunction()" type="submit" class="btn btn-danger"
+              [disabled]="resendOtpButtonDisabled">
+              Resend OTP
+            </button>
+          </ng-template>
+        </div>
+      </div>
 
-              <ng-template #one>
-                <h6 class="text-danger">Please try again after an hour</h6>
-              </ng-template>
-              <ng-template #two>
-                <button (click)="getOTPfunction()" type="submit" class="btn btn-danger"
-                  [disabled]="resendOtpButtonDisabled">
-                  Resend OTP
-                </button>
-              </ng-template>
-            </div>
-          </div>
-
-          <div class="col-sm">
-            <div *ngIf="GetButtonCount != 0">
-              <button [disabled]="!personalLoanForm.valid" (click)="verifyButton()" type="submit"
-                class="btn btn-success float-right">
-                Verify OTP
-              </button>
-            </div>
-          </div>
+      <div class="col-sm">
+        <div *ngIf="count != 0">
+          <button [disabled]="!personalLoanForm.valid" (click)="verifyButton()" type="submit"
+            class="btn btn-success float-right">
+            Verify OTP
+          </button>
         </div>
       </div>
     </div>

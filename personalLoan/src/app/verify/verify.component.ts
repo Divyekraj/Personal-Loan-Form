@@ -12,8 +12,6 @@ import swal from 'sweetalert2';
 export class VerifyComponent implements OnInit {
   title = 'personalLoan';
   count: number = 0;
-  GetButtonCount: number = 0;
-  VerifyButtonCount: number = 0;
   otpInputCount: number = 0;
 
   public resendOtpButtonDisabled: boolean = false;
@@ -102,8 +100,6 @@ export class VerifyComponent implements OnInit {
     });
     this.count++;
     this.otpInputCount++;
-    this.GetButtonCount++;
-    this.VerifyButtonCount++;
   }
 
   verifyButton() {
@@ -131,8 +127,7 @@ export class VerifyComponent implements OnInit {
             this.personalLoanForm.reset({});
           }
         });
-      this.GetButtonCount = 0;
-      this.VerifyButtonCount = 0;
+
       this.otpInputCount = 0;
       this.count = 0;
     }
