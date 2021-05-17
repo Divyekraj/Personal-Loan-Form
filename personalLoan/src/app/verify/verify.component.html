@@ -38,7 +38,7 @@
         <input type="text" class="form-control" formControlName="mobile" (keypress)="onlyNumber($event)" />
       </div>
       <span class="error" *ngIf="mobile.invalid && mobile.touched">
-        <span id="vt">* Enter 10 Digit Mobile No </span></span>
+        <span id="vt">* Number Start With(6-9) & Enter 10 Digit Mobile No </span></span>
     </div>
     <div class="form-group">
       <div *ngIf="otpInputCount == 0; then t1; else t2"></div>

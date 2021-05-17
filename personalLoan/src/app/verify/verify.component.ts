@@ -19,7 +19,7 @@ export class VerifyComponent implements OnInit {
 
   personalLoanForm: FormGroup;
 
-  constructor(private http: HttpClient, private formBuilder: FormBuilder) {
+  constructor(private http: HttpClient , private formBuilder: FormBuilder) {
     this.personalLoanForm = formBuilder.group({
       otp: [[Validators.required]],
       city: ['', Validators.required],
@@ -40,14 +40,18 @@ export class VerifyComponent implements OnInit {
       mobile: [
         '',
         [
-          Validators.maxLength(10),
-          Validators.minLength(10),
+          // Validators.maxLength(10),
+          // Validators.minLength(10),
           Validators.required,
-          Validators.pattern('^((\\+91-?)|0)?[0-9]{10}$'),
+          Validators.pattern('[6-9]{1}[0-9]{9}'),
+          // Validators.pattern('^((\\+91-?)|0)?[0-9]{10}$'),
         ],
+        
       ],
     });
   }
+
+  
 
   get city() {
     return this.personalLoanForm.get('city');
@@ -71,14 +75,16 @@ export class VerifyComponent implements OnInit {
   ngOnInit() {}
 
   getOTPfunction() {
+    // this.http
+    //   .post('http://lab.thinkoverit.com/api/getOTP.php', {
+    //     panNumber: this.personalLoanForm.get('panNumber').value,
+    //     city: this.personalLoanForm.get('city').value,
+    //     fullname: this.personalLoanForm.get('fullname').value,
+    //     email: this.personalLoanForm.get('email').value,
+    //     mobile: this.personalLoanForm.get('mobile').value,
+    //   })
     this.http
-      .post('http://lab.thinkoverit.com/api/getOTP.php', {
-        panNumber: this.personalLoanForm.get('panNumber').value,
-        city: this.personalLoanForm.get('city').value,
-        fullname: this.personalLoanForm.get('fullname').value,
-        email: this.personalLoanForm.get('email').value,
-        mobile: this.personalLoanForm.get('mobile').value,
-      })
+      .post('http://lab.thinkoverit.com/api/getOTP.php',this.personalLoanForm.value)
       .subscribe((res) => {
         console.warn('result', res);
         swal.fire({
@@ -112,8 +118,10 @@ export class VerifyComponent implements OnInit {
     } else {
       this.http
         .post('http://lab.thinkoverit.com/api/verifyOTP.php', {
-          mobile: this.personalLoanForm.get('mobile').value,
-          otp: this.personalLoanForm.get('otp').value,
+          // mobile: this.personalLoanForm.get('mobile').value,
+          // otp: this.personalLoanForm.get('otp').value,
+          mobile: this.personalLoanForm.value.mobile,
+          otp: this.personalLoanForm.value.otp,
         })
         .subscribe((res: any) => {
           console.warn('result', res);
@@ -123,11 +131,9 @@ export class VerifyComponent implements OnInit {
               title: 'Thank you for verification!',
               text: this.personalLoanForm.get('fullname').value,
             });
-
             this.personalLoanForm.reset({});
           }
         });
-
       this.otpInputCount = 0;
       this.count = 0;
     }
