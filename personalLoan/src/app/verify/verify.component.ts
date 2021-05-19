@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { interval, Subscription } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import Swal from 'sweetalert2';
 // import swal from 'sweetalert2';
 
 @Component({
@@ -13,7 +14,7 @@ export class VerifyComponent implements OnInit {
   title = 'personalLoan';
   count: number = 0;
   otpInputCount: number = 0;
-  Message: string;
+
 
   public resendOtpButtonDisabled: boolean = false;
   resendButtonTimeOut: Subscription;
@@ -22,7 +23,7 @@ export class VerifyComponent implements OnInit {
 
   constructor(private http: HttpClient, private formBuilder: FormBuilder) {
     this.personalLoanForm = formBuilder.group({
-      otp: [Validators.required],
+      otp: ['1234', Validators.required],
       city: ['', Validators.required],
       panNumber: [
         '',
@@ -64,7 +65,9 @@ export class VerifyComponent implements OnInit {
     return this.personalLoanForm.get('otp');
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+
+  }
 
   getOTPfunction() {
     this.http
@@ -72,20 +75,26 @@ export class VerifyComponent implements OnInit {
         'http://lab.thinkoverit.com/api/getOTP.php',
         this.personalLoanForm.value
       )
-      .subscribe((res) => {
-        console.warn('result', res);
-        this.Message = 'Sent OPT';
-      });
-    setTimeout(() => {
-      this.count++;
-      this.otpInputCount++;
-      this.resendOtpButtonDisabled = true;
-      this.Message = '';
-    }, 3000);
 
-    this.personalLoanForm.patchValue({
-      otp: '',
-    });
+      .subscribe((res: any) => {
+        // console.warn('result', res);
+        if (res.statusCode === 200) {
+          console.warn('result', res);
+          Swal.fire({
+            text: 'Sent OTP'
+          })
+
+          this.count++;
+          this.otpInputCount++;
+          this.resendOtpButtonDisabled = true;
+          this.personalLoanForm.patchValue({
+            otp: '',
+          });
+
+        }
+      });
+
+
 
     const second = interval(1000);
     this.resendButtonTimeOut = second.subscribe((res) => {
@@ -97,28 +106,31 @@ export class VerifyComponent implements OnInit {
   }
 
   verifyButton() {
-    var Otp = this.personalLoanForm.get('otp').value;
-    if (Otp == '') {
-      this.Message = 'Please Enter OPT';
-    } else {
-      this.http
-        .post('http://lab.thinkoverit.com/api/verifyOTP.php', {
-          mobile: this.personalLoanForm.value.mobile,
-          otp: this.personalLoanForm.value.otp,
-        })
-        .subscribe((res: any) => {
-          console.warn('result', res);
-          if (res.statusCode === 200) {
-            this.Message = `Thank you for verification! ${this.personalLoanForm.value.fullname}`;
-          }
-        });
-      setTimeout(() => {
-        this.otpInputCount = 0;
-        this.count = 0;
-        this.personalLoanForm.reset({});
-        this.Message = '';
-      }, 4000);
-    }
+
+    this.http
+      .post('http://lab.thinkoverit.com/api/verifyOTP.php', {
+        mobile: this.personalLoanForm.value.mobile,
+        otp: this.personalLoanForm.value.otp,
+      })
+      .subscribe((res: any) => {
+        console.warn('result', res);
+        if (res.statusCode === 200) {
+          Swal.fire({
+            title: 'Thank you for verification!',
+            text: this.personalLoanForm.value.fullname
+          })
+
+          this.otpInputCount = 0;
+          this.count = 0;
+          this.personalLoanForm.reset({});
+          this.personalLoanForm.patchValue({
+            otp: '1234'
+          });
+
+        }
+      });
+
+
   }
   onlyNumber(event): any {
     const no = event.which ? event.which : event.keyCode;
