@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { interval, Subscription } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import swal from 'sweetalert2';
+// import swal from 'sweetalert2';
 
 @Component({
   selector: 'app-verify',
@@ -13,15 +13,16 @@ export class VerifyComponent implements OnInit {
   title = 'personalLoan';
   count: number = 0;
   otpInputCount: number = 0;
+  Message: string;
 
   public resendOtpButtonDisabled: boolean = false;
   resendButtonTimeOut: Subscription;
 
   personalLoanForm: FormGroup;
 
-  constructor(private http: HttpClient , private formBuilder: FormBuilder) {
+  constructor(private http: HttpClient, private formBuilder: FormBuilder) {
     this.personalLoanForm = formBuilder.group({
-      otp: [[Validators.required]],
+      otp: [Validators.required],
       city: ['', Validators.required],
       panNumber: [
         '',
@@ -39,19 +40,10 @@ export class VerifyComponent implements OnInit {
       ],
       mobile: [
         '',
-        [
-          // Validators.maxLength(10),
-          // Validators.minLength(10),
-          Validators.required,
-          Validators.pattern('[6-9]{1}[0-9]{9}'),
-          // Validators.pattern('^((\\+91-?)|0)?[0-9]{10}$'),
-        ],
-        
+        [Validators.required, Validators.pattern('[6-9]{1}[0-9]{9}')],
       ],
     });
   }
-
-  
 
   get city() {
     return this.personalLoanForm.get('city');
@@ -72,27 +64,25 @@ export class VerifyComponent implements OnInit {
     return this.personalLoanForm.get('otp');
   }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   getOTPfunction() {
-    // this.http
-    //   .post('http://lab.thinkoverit.com/api/getOTP.php', {
-    //     panNumber: this.personalLoanForm.get('panNumber').value,
-    //     city: this.personalLoanForm.get('city').value,
-    //     fullname: this.personalLoanForm.get('fullname').value,
-    //     email: this.personalLoanForm.get('email').value,
-    //     mobile: this.personalLoanForm.get('mobile').value,
-    //   })
     this.http
-      .post('http://lab.thinkoverit.com/api/getOTP.php',this.personalLoanForm.value)
+      .post(
+        'http://lab.thinkoverit.com/api/getOTP.php',
+        this.personalLoanForm.value
+      )
       .subscribe((res) => {
         console.warn('result', res);
-        swal.fire({
-          icon: 'success',
-          title: 'Send OTP!',
-        });
+        this.Message = 'Sent OPT';
       });
-    this.resendOtpButtonDisabled = true;
+    setTimeout(() => {
+      this.count++;
+      this.otpInputCount++;
+      this.resendOtpButtonDisabled = true;
+      this.Message = '';
+    }, 3000);
+
     this.personalLoanForm.patchValue({
       otp: '',
     });
@@ -104,38 +94,30 @@ export class VerifyComponent implements OnInit {
         this.resendOtpButtonDisabled = false;
       }
     });
-    this.count++;
-    this.otpInputCount++;
   }
 
   verifyButton() {
     var Otp = this.personalLoanForm.get('otp').value;
     if (Otp == '') {
-      swal.fire({
-        icon: 'error',
-        title: 'Enter OPT',
-      });
+      this.Message = 'Please Enter OPT';
     } else {
       this.http
         .post('http://lab.thinkoverit.com/api/verifyOTP.php', {
-          // mobile: this.personalLoanForm.get('mobile').value,
-          // otp: this.personalLoanForm.get('otp').value,
           mobile: this.personalLoanForm.value.mobile,
           otp: this.personalLoanForm.value.otp,
         })
         .subscribe((res: any) => {
           console.warn('result', res);
           if (res.statusCode === 200) {
-            swal.fire({
-              icon: 'success',
-              title: 'Thank you for verification!',
-              text: this.personalLoanForm.get('fullname').value,
-            });
-            this.personalLoanForm.reset({});
+            this.Message = `Thank you for verification! ${this.personalLoanForm.value.fullname}`;
           }
         });
-      this.otpInputCount = 0;
-      this.count = 0;
+      setTimeout(() => {
+        this.otpInputCount = 0;
+        this.count = 0;
+        this.personalLoanForm.reset({});
+        this.Message = '';
+      }, 4000);
     }
   }
   onlyNumber(event): any {
