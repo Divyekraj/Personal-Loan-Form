@@ -3,7 +3,6 @@ import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { interval, Subscription } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import Swal from 'sweetalert2';
-// import swal from 'sweetalert2';
 
 @Component({
   selector: 'app-verify',
@@ -15,15 +14,14 @@ export class VerifyComponent implements OnInit {
   count: number = 0;
   otpInputCount: number = 0;
 
-
   public resendOtpButtonDisabled: boolean = false;
   resendButtonTimeOut: Subscription;
 
   personalLoanForm: FormGroup;
+  personalLoanForm2: FormGroup;
 
   constructor(private http: HttpClient, private formBuilder: FormBuilder) {
     this.personalLoanForm = formBuilder.group({
-      otp: ['1234', Validators.required],
       city: ['', Validators.required],
       panNumber: [
         '',
@@ -44,6 +42,10 @@ export class VerifyComponent implements OnInit {
         [Validators.required, Validators.pattern('[6-9]{1}[0-9]{9}')],
       ],
     });
+
+    this.personalLoanForm2 = formBuilder.group({
+      otp: ['', Validators.required],
+    });
   }
 
   get city() {
@@ -62,12 +64,10 @@ export class VerifyComponent implements OnInit {
     return this.personalLoanForm.get('mobile');
   }
   get otp() {
-    return this.personalLoanForm.get('otp');
+    return this.personalLoanForm2.get('otp');
   }
 
-  ngOnInit() {
-
-  }
+  ngOnInit() { }
 
   getOTPfunction() {
     this.http
@@ -77,60 +77,47 @@ export class VerifyComponent implements OnInit {
       )
 
       .subscribe((res: any) => {
-        // console.warn('result', res);
         if (res.statusCode === 200) {
           console.warn('result', res);
           Swal.fire({
-            text: 'Sent OTP'
-          })
+            text: 'Sent OTP',
+          });
 
           this.count++;
           this.otpInputCount++;
           this.resendOtpButtonDisabled = true;
-          this.personalLoanForm.patchValue({
-            otp: '',
-          });
 
+          const second = interval(1000);
+          this.resendButtonTimeOut = second.subscribe((res) => {
+            if (res >= 180) {
+              this.resendButtonTimeOut.unsubscribe();
+              this.resendOtpButtonDisabled = false;
+            }
+          });
         }
       });
-
-
-
-    const second = interval(1000);
-    this.resendButtonTimeOut = second.subscribe((res) => {
-      if (res >= 180) {
-        this.resendButtonTimeOut.unsubscribe();
-        this.resendOtpButtonDisabled = false;
-      }
-    });
   }
 
   verifyButton() {
-
     this.http
       .post('http://lab.thinkoverit.com/api/verifyOTP.php', {
         mobile: this.personalLoanForm.value.mobile,
-        otp: this.personalLoanForm.value.otp,
+        otp: this.personalLoanForm2.value.otp,
       })
       .subscribe((res: any) => {
         console.warn('result', res);
         if (res.statusCode === 200) {
           Swal.fire({
             title: 'Thank you for verification!',
-            text: this.personalLoanForm.value.fullname
-          })
+            text: this.personalLoanForm.value.fullname,
+          });
 
           this.otpInputCount = 0;
           this.count = 0;
           this.personalLoanForm.reset({});
-          this.personalLoanForm.patchValue({
-            otp: '1234'
-          });
-
+          this.personalLoanForm2.reset({});
         }
       });
-
-
   }
   onlyNumber(event): any {
     const no = event.which ? event.which : event.keyCode;

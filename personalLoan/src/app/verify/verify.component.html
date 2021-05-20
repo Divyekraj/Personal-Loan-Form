@@ -2,9 +2,6 @@
   <h2 class="mb-0 text-center shadow-lg p-3 mb-5 rounded peronalHeading" id="">
     Personal Loan Form
   </h2>
-  <!-- <h4>
-    <p class="text-center text-primary">{{ Message }}</p>
-  </h4> -->
 
   <form enctype="multipart/form-data" [formGroup]="personalLoanForm">
     <div class="form-group">
@@ -61,24 +58,9 @@
       >
     </div>
     <div class="form-group">
-      <div *ngIf="otpInputCount == 0; then t1; else t2"></div>
-      <ng-template #t1>
+      <div *ngIf="otpInputCount == 0">
         <label>OTP <span id="vt">* Click on Get OTP</span> </label>
-      </ng-template>
-      <ng-template #t2>
-        <label>OTP <span id="vt">*</span> </label>
-        <input
-          type="text"
-          class="form-control"
-          formControlName="otp"
-          maxlength="4"
-          minlength="4"
-          (keypress)="onlyNumber($event)"
-        />
-        <span class="error" *ngIf="otp.invalid && otp.touched">
-          <span id="vt">* OTP 4 Digit Number </span>
-        </span>
-      </ng-template>
+      </div>
     </div>
     <div class="row">
       <div class="col-sm">
@@ -93,6 +75,27 @@
           </button>
         </div>
       </div>
+    </div>
+  </form>
+  <form [formGroup]="personalLoanForm2">
+    <div class="form-group">
+      <div *ngIf="otpInputCount != 0">
+        <label>OTP <span id="vt">*</span> </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="otp"
+          maxlength="4"
+          minlength="4"
+          (keypress)="onlyNumber($event)"
+        />
+        <span class="error" *ngIf="otp.invalid && otp.touched">
+          <span id="vt">* OTP 4 Digit Number </span>
+        </span>
+      </div>
+    </div>
+
+    <div class="row">
       <div class="col-sm">
         <div *ngIf="count != 0">
           <div *ngIf="count == 4; then one; else two"></div>
@@ -116,7 +119,7 @@
       <div class="col-sm">
         <div *ngIf="count != 0">
           <button
-            [disabled]="!personalLoanForm.valid"
+            [disabled]="!personalLoanForm2.valid"
             (click)="verifyButton()"
             type="submit"
             class="btn btn-success float-right"
