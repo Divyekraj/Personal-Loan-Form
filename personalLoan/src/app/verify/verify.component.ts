@@ -21,7 +21,7 @@ export class VerifyComponent implements OnInit {
   personalLoanForm2: FormGroup;
 
   constructor(private http: HttpClient, private formBuilder: FormBuilder) {
-    this.personalLoanForm = formBuilder.group({
+    this.personalLoanForm = formBuilder.group({ // personalLoanForm validations
       city: ['', Validators.required],
       panNumber: [
         '',
@@ -43,7 +43,7 @@ export class VerifyComponent implements OnInit {
       ],
     });
 
-    this.personalLoanForm2 = formBuilder.group({
+    this.personalLoanForm2 = formBuilder.group({  // personalLoanForm2 validations
       otp: ['', Validators.required],
     });
   }
@@ -69,7 +69,7 @@ export class VerifyComponent implements OnInit {
 
   ngOnInit() { }
 
-  getOTPfunction() {
+  getOTPfunction() { // code for Get OTP Button
     this.http
       .post(
         'http://lab.thinkoverit.com/api/getOTP.php',
@@ -87,7 +87,7 @@ export class VerifyComponent implements OnInit {
           this.otpInputCount++;
           this.resendOtpButtonDisabled = true;
 
-          const second = interval(1000);
+          const second = interval(1000); // code for OTP Timer
           this.resendButtonTimeOut = second.subscribe((res) => {
             if (res >= 180) {
               this.resendButtonTimeOut.unsubscribe();
@@ -98,7 +98,7 @@ export class VerifyComponent implements OnInit {
       });
   }
 
-  verifyButton() {
+  verifyButton() { // Code for Verify Button 
     this.http
       .post('http://lab.thinkoverit.com/api/verifyOTP.php', {
         mobile: this.personalLoanForm.value.mobile,
@@ -119,7 +119,7 @@ export class VerifyComponent implements OnInit {
         }
       });
   }
-  onlyNumber(event): any {
+  onlyNumber(event): any { // validation for Number Input and OTP input to insert only numerical value
     const no = event.which ? event.which : event.keyCode;
     if (no > 31 && (no < 48 || no > 57)) {
       return false;
